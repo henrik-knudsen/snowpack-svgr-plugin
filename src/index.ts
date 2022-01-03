@@ -11,7 +11,7 @@ import pluginTransformReactConstantElements from "@babel/plugin-transform-react-
 
 module.exports = function (_snowpackConfig, _pluginOptions) {
   return {
-    name: "svgr-plugin",
+    name: "snowpack-svgr-plugin",
     resolve: {
       input: [".svg"],
       output: [".js"],
