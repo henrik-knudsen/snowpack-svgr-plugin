@@ -69,7 +69,12 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
                         case 0: return [4 /*yield*/, fs_1.promises.readFile(filePath, "utf-8")];
                         case 1:
                             contents = _b.sent();
-                            return [4 /*yield*/, (0, core_2.transform)(contents, { icon: true, exportType: "named" }, { componentName: "ReactComponent" })];
+                            return [4 /*yield*/, (0, core_2.transform)(contents, {
+                                    icon: true,
+                                    exportType: "named",
+                                    svgo: true,
+                                    plugins: ["@svgr/plugin-svgo"],
+                                }, { componentName: "ReactComponent" })];
                         case 2:
                             code = _b.sent();
                             babelOptions = {

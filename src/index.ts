@@ -21,7 +21,12 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
 
       const code = await transform(
         contents,
-        { icon: true, exportType: "named" },
+        {
+          icon: true,
+          exportType: "named",
+          svgo: true,
+          plugins: ["@svgr/plugin-svgo"],
+        },
         { componentName: "ReactComponent" }
       );
 
