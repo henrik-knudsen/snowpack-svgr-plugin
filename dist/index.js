@@ -49,6 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@babel/core");
 var core_2 = require("@svgr/core");
+var svgo_1 = require("svgo");
 var fs_1 = require("fs");
 var preset_react_1 = require("@babel/preset-react");
 var preset_env_1 = require("@babel/preset-env");
@@ -63,17 +64,16 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
         load: function (_a) {
             var filePath = _a.filePath;
             return __awaiter(this, void 0, void 0, function () {
-                var contents, code, babelOptions, babelConfig, transformOptions, result;
+                var contents, optimized, code, babelOptions, babelConfig, transformOptions, result;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0: return [4 /*yield*/, fs_1.promises.readFile(filePath, "utf-8")];
                         case 1:
                             contents = _b.sent();
-                            return [4 /*yield*/, (0, core_2.transform)(contents, {
+                            optimized = (0, svgo_1.optimize)(contents);
+                            return [4 /*yield*/, (0, core_2.transform)(optimized.data, {
                                     icon: true,
                                     exportType: "named",
-                                    svgo: true,
-                                    plugins: ["@svgr/plugin-svgo"],
                                 }, { componentName: "ReactComponent" })];
                         case 2:
                             code = _b.sent();
