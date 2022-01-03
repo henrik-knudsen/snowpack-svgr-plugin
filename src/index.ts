@@ -4,6 +4,7 @@ import {
   transformAsync,
 } from "@babel/core";
 import { transform } from "@svgr/core";
+import { optimize } from "svgo";
 import { promises as fs } from "fs";
 import presetReact from "@babel/preset-react";
 import presetEnv from "@babel/preset-env";
@@ -19,13 +20,13 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     async load({ filePath }) {
       const contents = await fs.readFile(filePath, "utf-8");
 
+      const optimized = optimize(contents);
+
       const code = await transform(
-        contents,
+        optimized.data,
         {
           icon: true,
           exportType: "named",
-          svgo: true,
-          plugins: ["@svgr/plugin-svgo"],
         },
         { componentName: "ReactComponent" }
       );
