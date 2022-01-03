@@ -1,8 +1,12 @@
 {
+
   "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES2020",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "skipLibCheck": true,
-    "strict": false
+    "strict": false,
+    "moduleResolution": "node"
   }
 }
