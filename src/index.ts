@@ -15,7 +15,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     name: "snowpack-svgr-plugin",
     resolve: {
       input: [".svg"],
-      output: [".js"],
+      output: [".js", ".svg"],
     },
     async load({ filePath }) {
       const contents = await fs.readFile(filePath, "utf-8");
@@ -49,7 +49,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
       const transformOptions = babelConfig?.options;
 
       const result = (await transformAsync(code, transformOptions)) || {};
-      return result.code;
+
+      return {
+        ".js": result?.code,
+        ".svg": optimized,
+      };
     },
   };
 };

@@ -59,7 +59,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
         name: "snowpack-svgr-plugin",
         resolve: {
             input: [".svg"],
-            output: [".js"],
+            output: [".js", ".svg"],
         },
         load: function (_a) {
             var filePath = _a.filePath;
@@ -91,7 +91,10 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
                             return [4 /*yield*/, (0, core_1.transformAsync)(code, transformOptions)];
                         case 3:
                             result = (_b.sent()) || {};
-                            return [2 /*return*/, result.code];
+                            return [2 /*return*/, {
+                                    ".js": result === null || result === void 0 ? void 0 : result.code,
+                                    ".svg": optimized,
+                                }];
                     }
                 });
             });
