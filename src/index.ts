@@ -15,7 +15,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     name: "snowpack-svgr-plugin",
     resolve: {
       input: [".svg"],
-      output: [".js", ".svg"],
+      output: [".js"],
     },
     async load({ filePath }) {
       const contents = await fs.readFile(filePath, "utf-8");
