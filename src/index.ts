@@ -52,7 +52,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
 
       return `
       ${result.code}
-      const _svg = ${optimized.data};
+      const _svg = '${optimized.data}';
       export default _svg;
       `;
     },

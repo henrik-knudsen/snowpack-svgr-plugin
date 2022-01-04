@@ -91,7 +91,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
                             return [4 /*yield*/, (0, core_1.transformAsync)(code, transformOptions)];
                         case 3:
                             result = (_b.sent()) || {};
-                            return [2 /*return*/, "\n      ".concat(result.code, "\n      const _svg = ").concat(optimized.data, ";\n      export default _svg;\n      ")];
+                            return [2 /*return*/, "\n      ".concat(result.code, "\n      const _svg = '").concat(optimized.data, "';\n      export default _svg;\n      ")];
                     }
                 });
             });
