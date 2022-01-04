@@ -6,6 +6,9 @@ import {
 import { transform } from "@svgr/core";
 import { optimize } from "svgo";
 import { promises as fs } from "fs";
+import { getUrlForFile } from "snowpack";
+import * as path from "path";
+import * as mime from "mime";
 import presetReact from "@babel/preset-react";
 import presetEnv from "@babel/preset-env";
 import pluginTransformReactConstantElements from "@babel/plugin-transform-react-constant-elements";
@@ -15,7 +18,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
     name: "snowpack-svgr-plugin",
     resolve: {
       input: [".svg"],
-      output: [".js"],
+      output: [".js", ".svg"],
     },
     async load({ filePath }) {
       const contents = await fs.readFile(filePath, "utf-8");
@@ -32,6 +35,7 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
       );
 
       const babelOptions = {
+        filename: filePath,
         babelrc: false,
         configFile: false,
         presets: [
@@ -48,13 +52,47 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
 
       const transformOptions = babelConfig?.options;
 
-      const result = (await transformAsync(code, transformOptions)) || {};
+      const transformed = (await transformAsync(code, transformOptions)) || {};
 
-      return `
-      ${result.code}
-      const _svg = '${optimized.data}';
-      export default _svg;
-      `;
+      let result = transformed.code;
+
+      const encodedUrl = await encode(filePath, filePath);
+
+      const uri = encodedUrl
+        ? encodedUrl
+        : (getUrlForFile(filePath, _snowpackConfig) ?? "").replace(
+            ".js",
+            ".svg"
+          );
+
+      if (!uri) {
+        console.error(`No url found for ${filePath}`);
+      }
+
+      result = result.replace(
+        /export {.+};/,
+        `export default "${uri}"; export { ReactComponent };`
+      );
+
+      return {
+        ".js": result,
+        ".svg": await fs.readFile(filePath),
+      };
     },
   };
+};
+
+const encode = async (file: string, name: string) => {
+  const encoding = "binary";
+  if (path.isAbsolute(file)) {
+    file = await fs.readFile(file, encoding);
+  }
+
+  if (file.length > 10240) {
+    return;
+  }
+
+  const mimetype = mime.getType(name);
+  const buffer = Buffer.from(file, encoding);
+  return `data:${mimetype || ""};base64,${buffer.toString("base64")}`;
 };

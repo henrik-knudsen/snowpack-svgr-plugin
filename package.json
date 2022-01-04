@@ -13,6 +13,8 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-react": "^7.16.7",
     "@svgr/core": "^6.1.2",
+    "mime": "^3.0.0",
+    "snowpack": "^3.8.8",
     "svgo": "^2.8.0"
   },
   "devDependencies": {

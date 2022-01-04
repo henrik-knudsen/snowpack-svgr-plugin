@@ -51,6 +51,9 @@ var core_1 = require("@babel/core");
 var core_2 = require("@svgr/core");
 var svgo_1 = require("svgo");
 var fs_1 = require("fs");
+var snowpack_1 = require("snowpack");
+var path = require("path");
+var mime = require("mime");
 var preset_react_1 = require("@babel/preset-react");
 var preset_env_1 = require("@babel/preset-env");
 var plugin_transform_react_constant_elements_1 = require("@babel/plugin-transform-react-constant-elements");
@@ -59,25 +62,28 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
         name: "snowpack-svgr-plugin",
         resolve: {
             input: [".svg"],
-            output: [".js"],
+            output: [".js", ".svg"],
         },
         load: function (_a) {
+            var _b;
             var filePath = _a.filePath;
             return __awaiter(this, void 0, void 0, function () {
-                var contents, optimized, code, babelOptions, babelConfig, transformOptions, result;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var contents, optimized, code, babelOptions, babelConfig, transformOptions, transformed, result, encodedUrl, uri, _c;
+                var _d;
+                return __generator(this, function (_e) {
+                    switch (_e.label) {
                         case 0: return [4 /*yield*/, fs_1.promises.readFile(filePath, "utf-8")];
                         case 1:
-                            contents = _b.sent();
+                            contents = _e.sent();
                             optimized = (0, svgo_1.optimize)(contents);
                             return [4 /*yield*/, (0, core_2.transform)(optimized.data, {
                                     icon: true,
                                     exportType: "named",
                                 }, { componentName: "ReactComponent" })];
                         case 2:
-                            code = _b.sent();
+                            code = _e.sent();
                             babelOptions = {
+                                filename: filePath,
                                 babelrc: false,
                                 configFile: false,
                                 presets: [
@@ -90,11 +96,49 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
                             transformOptions = babelConfig === null || babelConfig === void 0 ? void 0 : babelConfig.options;
                             return [4 /*yield*/, (0, core_1.transformAsync)(code, transformOptions)];
                         case 3:
-                            result = (_b.sent()) || {};
-                            return [2 /*return*/, "\n      ".concat(result.code, "\n      const _svg = '").concat(optimized.data, "';\n      export default _svg;\n      ")];
+                            transformed = (_e.sent()) || {};
+                            result = transformed.code;
+                            return [4 /*yield*/, encode(filePath, filePath)];
+                        case 4:
+                            encodedUrl = _e.sent();
+                            uri = encodedUrl
+                                ? encodedUrl
+                                : ((_b = (0, snowpack_1.getUrlForFile)(filePath, _snowpackConfig)) !== null && _b !== void 0 ? _b : "").replace(".js", ".svg");
+                            if (!uri) {
+                                console.error("No url found for ".concat(filePath));
+                            }
+                            result = result.replace(/export {.+};/, "export default \"".concat(uri, "\"; export { ReactComponent };"));
+                            _d = {
+                                ".js": result
+                            };
+                            _c = ".svg";
+                            return [4 /*yield*/, fs_1.promises.readFile(filePath)];
+                        case 5: return [2 /*return*/, (_d[_c] = _e.sent(),
+                                _d)];
                     }
                 });
             });
         },
     };
 };
+var encode = function (file, name) { return __awaiter(void 0, void 0, void 0, function () {
+    var encoding, mimetype, buffer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                encoding = "binary";
+                if (!path.isAbsolute(file)) return [3 /*break*/, 2];
+                return [4 /*yield*/, fs_1.promises.readFile(file, encoding)];
+            case 1:
+                file = _a.sent();
+                _a.label = 2;
+            case 2:
+                if (file.length > 10240) {
+                    return [2 /*return*/];
+                }
+                mimetype = mime.getType(name);
+                buffer = Buffer.from(file, encoding);
+                return [2 /*return*/, "data:".concat(mimetype || "", ";base64,").concat(buffer.toString("base64"))];
+        }
+    });
+}); };
