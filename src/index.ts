@@ -50,10 +50,11 @@ module.exports = function (_snowpackConfig, _pluginOptions) {
 
       const result = (await transformAsync(code, transformOptions)) || {};
 
-      return {
-        ".js": result?.code,
-        ".svg": optimized.data,
-      };
+      return `
+      ${result.code}
+      const _svg = ${optimized.data};
+      export default _svg;
+      `;
     },
   };
 };
